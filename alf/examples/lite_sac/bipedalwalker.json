@@ -1,0 +1,18 @@
+{
+    "desc": [],
+    "use_gpu": true,
+    "gpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "max_worker_num": 3,
+    "repeats": 3,
+    "parameters": {
+      "create_environment.env_name": [
+        "BipedalWalker-v2",
+        "BipedalWalkerHardcore-v2"
+      ]
+    }
+  }

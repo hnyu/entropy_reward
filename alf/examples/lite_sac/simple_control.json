@@ -1,0 +1,20 @@
+{
+  "desc": [
+  ],
+  "use_gpu": true,
+  "gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "max_worker_num": 4,
+  "repeats": 3,
+  "parameters": {
+    "create_environment.env_name": [
+      "MountainCarContinuous-v0",
+      "LunarLanderContinuous-v2",
+      "InvertedDoublePendulum-v2"
+    ]
+  }
+}
