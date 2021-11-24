@@ -22,7 +22,7 @@ from scipy.signal import savgol_filter
 import matplotlib
 import matplotlib.pyplot as plt
 # Style gallery: https://tonysyu.github.io/raw_content/matplotlib-style-gallery/gallery.html
-plt.style.use('seaborn-dark')
+#plt.style.use('seaborn-dark')
 
 import alf.nest as nest
 from alf.data_structures import namedtuple
@@ -211,7 +211,12 @@ class MeanCurveReader(object):
             tuple: the first is the adjusted x values and the second is the
                 interpolated and smoothed y values.
         """
-        func = interp1d(steps, values, kind=kind, fill_value='extrapolate')
+        func = interp1d(
+            steps,
+            values,
+            kind=kind,
+            fill_value=(values[0], values[-1]),
+            bounds_error=False)
         new_values = func(output_x)
 
         if isinstance(smoothing, int):
@@ -279,11 +284,11 @@ class EnvironmentStepsReturnReader(MeanCurveReader):
 
     @property
     def x_label(self):
-        return "Environment Steps"
+        return "Environment steps"
 
     @property
     def y_label(self):
-        return "Average Episodic Return"
+        return "Episodic return"
 
 
 class EnvironmentStepsSuccessReader(MeanCurveReader):
@@ -408,7 +413,8 @@ class CurvesPlotter(object):
     ``min_y`` and ``max_y`` will be plotted by a shaded area around ``y``, and
     its ``x`` determines the x-axis range.
     """
-    _COLORS = ['C%d' % i for i in range(10)]
+    #_COLORS = ['C%d' % i for i in range(10)]
+    _COLORS = ['C0', 'C1', 'black'] + [f'C{i+2}' for i in range(8)]
 
     def __init__(self,
                  mean_curves,
@@ -424,9 +430,10 @@ class CurvesPlotter(object):
                  linestyle='-',
                  linewidth=2,
                  std_alpha=0.3,
-                 bg_color=None,
-                 grid_color=None,
+                 bg_color='white',
+                 grid_color='#e6e5e3',
                  plot_mean_only=False,
+                 shaded_area=True,
                  legend_kwargs=dict(loc="best"),
                  title=None):
         r"""
@@ -465,11 +472,14 @@ class CurvesPlotter(object):
             grid_color (str): color of the dashed grid lines
             plot_mean_only (bool): Whether only plot the mean curve without
                 shaded regions.
+            shaded_area (bool): if True, the variance of a MeanCurve will be plotted
+                as a shaded area; otherwise error bars will be drawn.
             legend_kwargs (dict): kwargs for plotting the legend. If None, then
                 no legend will be plotted.
             title (str): title of the figure
         """
         self._fig, ax = plt.subplots(1, figsize=figsize, dpi=dpi)
+        self._ax = ax
 
         if not isinstance(mean_curves, list):
             mean_curves = [mean_curves]
@@ -497,7 +507,7 @@ class CurvesPlotter(object):
             linestyle += linestyle[-1:] * (len(mean_curves) - len(linestyle))
 
         for i, c in enumerate(mean_curves):
-            if i < len(mean_curves) - 1:
+            if True:  #i < len(mean_curves) - 1:
                 color = self._COLORS[i % len(self._COLORS)]
 
             else:  # assume the last method is best; "black" for highlighting
@@ -511,12 +521,26 @@ class CurvesPlotter(object):
                 linestyle=linestyle[i],
                 label=c.name)
             if not plot_mean_only:
-                ax.fill_between(
-                    x,
-                    _clip_y(c.max_y),
-                    _clip_y(c.min_y),
-                    facecolor=color,
-                    alpha=std_alpha)
+                if shaded_area:
+                    ax.fill_between(
+                        x,
+                        _clip_y(c.max_y),
+                        _clip_y(c.min_y),
+                        facecolor=color,
+                        alpha=std_alpha)
+                else:
+                    ax.plot(
+                        x,
+                        _clip_y(c.max_y),
+                        color=color,
+                        lw=linewidth // 2,
+                        linestyle='--')
+                    ax.plot(
+                        x,
+                        _clip_y(c.min_y),
+                        color=color,
+                        lw=linewidth // 2,
+                        linestyle='--')
 
         if legend_kwargs is not None:
             ax.legend(**legend_kwargs)
@@ -534,10 +558,11 @@ class CurvesPlotter(object):
             ax.set_ylim(y_range)
         if x_label:
             ax.set_xlabel(x_label)
+            #ax.xaxis.set_label_coords(0.5, -0.3)
         if y_label:
             ax.set_ylabel(y_label)
         if title:
-            ax.set_title(title)
+            ax.set_title(title, fontsize=16)
 
     def plot(self, output_path, dpi=200, transparent=False, close_fig=True):
         """Plot curves and save the figure to disk.

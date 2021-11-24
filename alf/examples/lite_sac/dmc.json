@@ -1,5 +1,6 @@
 {
   "desc": [
+
   ],
   "use_gpu": true,
   "gpus": [
@@ -12,10 +13,14 @@
   "repeats": 3,
   "parameters": {
     "create_environment.env_name": [
-      "Hopper-v3",
-      "Ant-v3",
-      "Walker2d-v3",
-      "HalfCheetah-v3"
+      "pendulum:swingup",
+      "fish:upright",
+      "fish:swim",
+      "swimmer:swimmer6",
+      "ball_in_cup:catch",
+      "reacher:hard",
+      "finger:spin",
+      "finger:turn_hard"
     ]
   }
 }

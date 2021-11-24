@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+
 import alf
 from alf.examples import sac_conf
 from alf.examples.benchmarks.fetch import fetch_conf
@@ -20,6 +22,7 @@ alf.config(
     'SacAlgorithm',
     actor_network_cls=fetch_conf.actor_distribution_network_cls,
     critic_network_cls=fetch_conf.critic_network_cls,
+    #initial_log_alpha=math.log(0.1),
     target_update_tau=0.05,
     target_update_period=40)
 

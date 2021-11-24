@@ -11,20 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import math
+
 import alf
-
 from alf.examples import sac_conf
-from alf.examples.benchmarks.bipedalwalker import bipedalwalker_conf
+from alf.examples.benchmarks.dm_control import dm_control_conf
+from alf.algorithms.td_loss import TDLoss
 
-alf.config("Agent", optimizer=bipedalwalker_conf.optimizer)
+alf.config('Agent', optimizer=dm_control_conf.optimizer)
 
 alf.config(
     'SacAlgorithm',
-    actor_network_cls=bipedalwalker_conf.actor_distribution_network_cls,
-    critic_network_cls=bipedalwalker_conf.critic_network_cls,
-    #initial_log_alpha=math.log(0.1),
+    actor_network_cls=dm_control_conf.actor_distribution_network_cls,
+    critic_network_cls=dm_control_conf.critic_network_cls,
+    critic_loss_ctor=TDLoss,
     target_update_tau=0.005)
 
-alf.config('calc_default_target_entropy', min_prob=0.1)
+alf.config('calc_default_target_entropy', min_prob=0.2)

@@ -8,11 +8,11 @@
     2,
     3
   ],
-  "max_worker_num": 9,
-  "repeats": 9,
+  "max_worker_num": 4,
+  "repeats": 3,
   "parameters": {
     "create_environment.env_name": [
-      "LunarLanderContinuous-v2"
+      "ball_in_cup:catch"
     ]
   }
 }

@@ -17,6 +17,7 @@ from abc import abstractmethod
 import os
 import time
 import torch
+import copy
 from torch.nn.parallel import DistributedDataParallel as DDP
 from typing import Callable
 from absl import logging
@@ -415,6 +416,9 @@ class RLAlgorithm(Algorithm):
             if len(field) == 1:
                 summary_utils.summarize_distribution("rollout_action_dist",
                                                      field[0])
+
+                entropy, _ = dist_utils.entropy_with_fallback(field[0])
+                alf.summary.scalar("rollout_entropy/mean", entropy.mean())
 
     def summarize_train(self, experience, train_info, loss_info, params):
         """Generate summaries for training & loss info after each gradient update.

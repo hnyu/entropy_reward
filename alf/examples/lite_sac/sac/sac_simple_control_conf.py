@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import math
+
 import alf
 from alf.examples import sac_conf
 from alf.examples.benchmarks.simple_control import simple_control_conf
@@ -21,6 +23,7 @@ alf.config(
     'SacAlgorithm',
     actor_network_cls=simple_control_conf.actor_distribution_network_cls,
     critic_network_cls=simple_control_conf.critic_network_cls,
+    #initial_log_alpha=math.log(0.1),
     target_update_tau=0.005)
 
 alf.config('calc_default_target_entropy', min_prob=0.1)

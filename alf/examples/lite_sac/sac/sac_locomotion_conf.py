@@ -11,10 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import math
+import gym
 
 import alf
 from alf.examples import sac_conf
 from alf.examples.benchmarks.locomotion import locomotion_conf
+from alf.algorithms.data_transformer import RewardScaling
+
+
+class WorstRewardInfoWrapper(gym.Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def step(self, action):
+        obs, reward, done, info = self.env.step(action)
+        info['worst_reward'] = 0.
+        return obs, reward, done, info
+
+
+alf.config('suite_gym.load', gym_env_wrappers=(WorstRewardInfoWrapper, ))
 
 alf.config('Agent', optimizer=locomotion_conf.optimizer)
 
@@ -22,6 +38,8 @@ alf.config(
     'SacAlgorithm',
     actor_network_cls=locomotion_conf.actor_distribution_network_cls,
     critic_network_cls=locomotion_conf.critic_network_cls,
+    #initial_log_alpha=math.log(0.1),
+    #alpha_optimizer=alf.optimizers.AdamTF(lr=0),
     reproduce_locomotion=True,
     target_update_tau=0.005)
 

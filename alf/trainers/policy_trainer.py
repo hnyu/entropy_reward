@@ -634,6 +634,12 @@ def _step(algorithm,
         time.sleep(sleep_time_per_step)
 
     next_time_step = env.step(policy_step.output)
+
+    # HACK: compute the r(s,a)-log pi(s,a)
+    if "worst_reward" in time_step.env_info:
+        time_step.env_info['worst_reward'] = (
+            policy_state.rl.historical_entropy[:, -1] + time_step.reward)
+
     for metric in metrics:
         metric(time_step.cpu())
     return next_time_step, policy_step, trans_state
