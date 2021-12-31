@@ -20,6 +20,11 @@ from alf.examples.benchmarks.locomotion import locomotion_conf
 from alf.algorithms.data_transformer import RewardScaling
 
 
+@alf.configurable
+def conf(alpha_lr=None):
+    pass
+
+
 class WorstRewardInfoWrapper(gym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
@@ -34,12 +39,17 @@ alf.config('suite_gym.load', gym_env_wrappers=(WorstRewardInfoWrapper, ))
 
 alf.config('Agent', optimizer=locomotion_conf.optimizer)
 
+if alf.get_config_value("conf.alpha_lr") == "0":
+    alpha_optimizer = alf.optimizers.AdamTF(lr=0)
+else:
+    alpha_optimizer = None
+
 alf.config(
     'SacAlgorithm',
     actor_network_cls=locomotion_conf.actor_distribution_network_cls,
     critic_network_cls=locomotion_conf.critic_network_cls,
     #initial_log_alpha=math.log(0.1),
-    #alpha_optimizer=alf.optimizers.AdamTF(lr=0),
+    alpha_optimizer=alpha_optimizer,
     reproduce_locomotion=True,
     target_update_tau=0.005)
 
